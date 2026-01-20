@@ -3,9 +3,9 @@ package com.desenvolvimento.transito.api.controller;
 
 import com.desenvolvimento.transito.domain.model.Proprietario;
 import com.desenvolvimento.transito.domain.repository.ProprietarioRepository;
+import com.desenvolvimento.transito.domain.service.RegistroProprietarioService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +17,8 @@ import java.util.List;
 @RequestMapping("/proprietarios")
 public class ProprietarioController {
 
-    @Autowired
+
+    private final RegistroProprietarioService registroProprietarioService;
     private final ProprietarioRepository proprietarioRepository;
 
     @GetMapping()
@@ -35,18 +36,19 @@ public class ProprietarioController {
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     public Proprietario adicionar(@Valid @RequestBody Proprietario proprietario) {
-        return proprietarioRepository.save(proprietario);
+        return registroProprietarioService.salvar(proprietario);
     }
+
 
     @PutMapping("{proprietarioId}")
     public ResponseEntity<Proprietario> atualizar(@PathVariable Long proprietarioId,
-                                                  @RequestBody Proprietario proprietario){
+                                                  @RequestBody Proprietario proprietario) {
         if (!proprietarioRepository.existsById(proprietarioId)) {
             return ResponseEntity.notFound().build();
         }
 
         proprietario.setId(proprietarioId);
-        Proprietario proprietarioAtualizado = proprietarioRepository.save(proprietario);
+        Proprietario proprietarioAtualizado = registroProprietarioService.salvar(proprietario);
 
         return ResponseEntity.ok(proprietarioAtualizado);
     }
@@ -56,8 +58,7 @@ public class ProprietarioController {
         if (!proprietarioRepository.existsById(proprietarioId)) {
             return ResponseEntity.notFound().build();
         }
-
-        proprietarioRepository.deleteById(proprietarioId);
+        registroProprietarioService.excluir(proprietarioId);
         return ResponseEntity.noContent().build();
     }
 }
