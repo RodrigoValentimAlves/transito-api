@@ -1,31 +1,70 @@
 package com.desenvolvimento.transito.api.controller;
 
 
+import com.desenvolvimento.transito.domain.exception.NegocioException;
 import com.desenvolvimento.transito.domain.model.Proprietario;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.desenvolvimento.transito.domain.repository.ProprietarioRepository;
+import com.desenvolvimento.transito.domain.service.RegistroProprietarioService;
+import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
 import java.util.List;
 
+@AllArgsConstructor
 @RestController
+@RequestMapping("/proprietarios")
 public class ProprietarioController {
 
-    @GetMapping("/proprietarios")
+
+    private final RegistroProprietarioService registroProprietarioService;
+    private final ProprietarioRepository proprietarioRepository;
+
+    @GetMapping()
     public List<Proprietario> listar() {
-        var proprietario1 = new Proprietario();
-        proprietario1.setId(1L);
-        proprietario1.setNome("João");
-        proprietario1.setTelefone("34 99999-1111");
-        proprietario1.setEmail("joaodascouves@algaworks.com");
-
-        var proprietario2 = new Proprietario();
-        proprietario2.setId(2L);
-        proprietario2.setNome("Maria");
-        proprietario2.setTelefone("11 97777-1111");
-        proprietario2.setEmail("mariadasilva@algaworks.com");
-
-        return Arrays.asList(proprietario1, proprietario2);
+        return proprietarioRepository.findAll();
     }
 
+    @GetMapping("/{proprietarioId}")
+    public ResponseEntity<Proprietario> buscar(@PathVariable Long proprietarioId) {
+        return proprietarioRepository.findById(proprietarioId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.noContent().build());
+    }
+
+    @PostMapping()
+    @ResponseStatus(HttpStatus.CREATED)
+    public Proprietario adicionar(@Valid @RequestBody Proprietario proprietario) {
+        return registroProprietarioService.salvar(proprietario);
+    }
+
+
+    @PutMapping("{proprietarioId}")
+    public ResponseEntity<Proprietario> atualizar(@Valid @PathVariable Long proprietarioId,
+                                                  @RequestBody Proprietario proprietario) {
+        if (!proprietarioRepository.existsById(proprietarioId)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        proprietario.setId(proprietarioId);
+        Proprietario proprietarioAtualizado = registroProprietarioService.salvar(proprietario);
+
+        return ResponseEntity.ok(proprietarioAtualizado);
+    }
+
+    @DeleteMapping("/{proprietarioId}")
+    public ResponseEntity<Void> remover(@PathVariable Long proprietarioId) {
+        if (!proprietarioRepository.existsById(proprietarioId)) {
+            return ResponseEntity.notFound().build();
+        }
+        registroProprietarioService.excluir(proprietarioId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @ExceptionHandler(NegocioException.class)
+    public ResponseEntity<String> capturar(NegocioException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
 }
