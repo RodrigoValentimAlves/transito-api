@@ -1,6 +1,5 @@
 package com.desenvolvimento.transito.api.controller;
 
-import com.desenvolvimento.transito.domain.exception.NegocioException;
 import com.desenvolvimento.transito.domain.model.Veiculo;
 import com.desenvolvimento.transito.domain.repository.VeiculoRepository;
 import com.desenvolvimento.transito.domain.service.RegistroVeiculoService;
@@ -19,6 +18,7 @@ public class VeiculoController {
 
     private final VeiculoRepository veiculoRepository;
     private final RegistroVeiculoService registroVeiculoService;
+
     public List<Veiculo> listar() {
         return veiculoRepository.findAll();
     }
@@ -36,8 +36,4 @@ public class VeiculoController {
         return registroVeiculoService.cadastrar(veiculo);
     }
 
-    @ExceptionHandler(NegocioException.class)
-    public ResponseEntity<String> capturar(NegocioException e) {
-        return ResponseEntity.badRequest().body(e.getMessage());
-    }
 }
