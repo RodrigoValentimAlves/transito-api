@@ -9,7 +9,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @AllArgsConstructor
 @Service
@@ -22,7 +22,7 @@ public class RegistroVeiculoService {
     public Veiculo cadastrar(Veiculo novoVeiculo) {
 
         if (novoVeiculo.getId() != null) {
-           throw new NegocioException("Cadastro de veículo não deve conter id");
+            throw new NegocioException("Cadastro de veículo não deve conter id");
         }
 
         boolean placaEmUso = veiculoRepository.findByPlaca(novoVeiculo.getPlaca())
@@ -37,7 +37,7 @@ public class RegistroVeiculoService {
 
         novoVeiculo.setProprietario(proprietario);
         novoVeiculo.setStatus(StatusVeiculo.REGULAR);
-        novoVeiculo.setDataCadastro(LocalDateTime.now());
+        novoVeiculo.setDataCadastro(OffsetDateTime.now());
 
         return veiculoRepository.save(novoVeiculo);
     }

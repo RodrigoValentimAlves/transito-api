@@ -1,6 +1,8 @@
 package com.desenvolvimento.transito.api.controller;
 
-import com.desenvolvimento.transito.domain.exception.NegocioException;
+import com.desenvolvimento.transito.api.assembler.VeiculoAssembler;
+import com.desenvolvimento.transito.api.model.VeiculoModel;
+import com.desenvolvimento.transito.api.model.input.VeiculoInput;
 import com.desenvolvimento.transito.domain.model.Veiculo;
 import com.desenvolvimento.transito.domain.repository.VeiculoRepository;
 import com.desenvolvimento.transito.domain.service.RegistroVeiculoService;
@@ -19,25 +21,29 @@ public class VeiculoController {
 
     private final VeiculoRepository veiculoRepository;
     private final RegistroVeiculoService registroVeiculoService;
-    public List<Veiculo> listar() {
-        return veiculoRepository.findAll();
+    private final VeiculoAssembler veiculoAssembler;
+
+    @GetMapping
+    public List<VeiculoModel> listar() {
+        return veiculoAssembler.toCollectionModel(veiculoRepository.findAll());
     }
 
     @GetMapping("/{veiculoId}")
-    public ResponseEntity<Veiculo> buscar(@PathVariable Long veiculoId) {
+    public ResponseEntity<VeiculoModel> buscar(@PathVariable Long veiculoId) {
         return veiculoRepository.findById(veiculoId)
+                .map(veiculoAssembler::toModel)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Veiculo cadastrar(@Valid @RequestBody Veiculo veiculo) {
-        return registroVeiculoService.cadastrar(veiculo);
+    public VeiculoModel cadastrar(@Valid @RequestBody VeiculoInput veiculoInput) {
+        Veiculo novoVeiculo = veiculoAssembler.toEntity(veiculoInput);
+        Veiculo veiculoCadastrado = registroVeiculoService.cadastrar(novoVeiculo);
+
+
+        return veiculoAssembler.toModel(veiculoCadastrado);
     }
 
-    @ExceptionHandler(NegocioException.class)
-    public ResponseEntity<String> capturar(NegocioException e) {
-        return ResponseEntity.badRequest().body(e.getMessage());
-    }
 }
