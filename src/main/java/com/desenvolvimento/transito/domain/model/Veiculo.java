@@ -33,14 +33,13 @@ public class Veiculo {
     private OffsetDateTime dataCadastro;
     private OffsetDateTime dataApreensao;
 
-    @OneToMany(mappedBy = "veiculo")
+    @OneToMany(mappedBy = "veiculo", cascade = CascadeType.ALL)
     private List<Autuacao> autuacoes = new ArrayList<>();
 
     public Autuacao adicionarAutuacao(Autuacao autuacao) {
         autuacao.setDataOcorrencia(OffsetDateTime.now());
         autuacao.setVeiculo(this);
         getAutuacoes().add(autuacao);
-
         return autuacao;
     }
 }

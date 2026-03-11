@@ -1,5 +1,6 @@
 package com.desenvolvimento.transito.domain.service;
 
+import com.desenvolvimento.transito.domain.exception.EntidadadeNaoEncontradaException;
 import com.desenvolvimento.transito.domain.exception.NegocioException;
 import com.desenvolvimento.transito.domain.model.Proprietario;
 import com.desenvolvimento.transito.domain.model.StatusVeiculo;
@@ -20,7 +21,7 @@ public class RegistroVeiculoService {
 
     public Veiculo buscar(Long veiculoId) {
         return veiculoRepository.findById(veiculoId)
-                .orElseThrow(() -> new NegocioException("Veículo não encontrado"));
+                .orElseThrow(() -> new EntidadadeNaoEncontradaException("Veículo não encontrado"));
     }
 
     @Transactional

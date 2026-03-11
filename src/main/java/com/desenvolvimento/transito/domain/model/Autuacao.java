@@ -23,6 +23,8 @@ public class Autuacao {
     private Veiculo veiculo;
 
     private String descricao;
+
+    @Column(name = "valor_multa")
     private BigDecimal valor;
     private OffsetDateTime dataOcorrencia;
 }

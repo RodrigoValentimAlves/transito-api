@@ -1,5 +1,6 @@
 package com.desenvolvimento.transito.api.exceptionhandler;
 
+import com.desenvolvimento.transito.domain.exception.EntidadadeNaoEncontradaException;
 import com.desenvolvimento.transito.domain.exception.NegocioException;
 import lombok.AllArgsConstructor;
 import org.springframework.context.MessageSource;
@@ -48,6 +49,15 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
         problemDetail.setTitle(e.getMessage());
         problemDetail.setType(URI.create("https://transito.com/erros/regra-negocio"));
+
+        return problemDetail;
+    }
+
+    @ExceptionHandler(EntidadadeNaoEncontradaException.class)
+    public ProblemDetail handleEntidadeNaoEncontrada(EntidadadeNaoEncontradaException e) {
+        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
+        problemDetail.setTitle(e.getMessage());
+        problemDetail.setType(URI.create("https://transito.com/erros/nao-encontrado"));
 
         return problemDetail;
     }
