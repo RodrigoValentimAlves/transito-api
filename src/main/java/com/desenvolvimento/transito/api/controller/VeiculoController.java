@@ -5,6 +5,7 @@ import com.desenvolvimento.transito.api.model.VeiculoModel;
 import com.desenvolvimento.transito.api.model.input.VeiculoInput;
 import com.desenvolvimento.transito.domain.model.Veiculo;
 import com.desenvolvimento.transito.domain.repository.VeiculoRepository;
+import com.desenvolvimento.transito.domain.service.ApreensaoVeiculoService;
 import com.desenvolvimento.transito.domain.service.RegistroVeiculoService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -21,6 +22,7 @@ public class VeiculoController {
 
     private final VeiculoRepository veiculoRepository;
     private final RegistroVeiculoService registroVeiculoService;
+    private final ApreensaoVeiculoService apreensaoVeiculoService;
     private final VeiculoAssembler veiculoAssembler;
 
     @GetMapping
@@ -46,4 +48,15 @@ public class VeiculoController {
         return veiculoAssembler.toModel(veiculoCadastrado);
     }
 
+    @PutMapping("/{veiculoId}/apreensao")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void apreender(@PathVariable Long veiculoId) {
+        apreensaoVeiculoService.apreender(veiculoId);
+    }
+
+    @DeleteMapping("/{veiculoId}/apreensao")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void removerApreensao(@PathVariable Long veiculoId) {
+        apreensaoVeiculoService.removerApreensao(veiculoId);
+    }
 }
